@@ -22,6 +22,7 @@ import math
 import os
 import numpy as np
 import tensorflow as tf
+from PIL import Image
 
 import lanms
 import model
@@ -41,7 +42,8 @@ tf.app.flags.DEFINE_string('image_path','../data/images',
                            """Base directory for image training data""")
 tf.app.flags.DEFINE_string('filename_pattern','*',
                            """File pattern for input data""")
-
+tf.app.flags.DEFINE_string('filename_extension','tiff',
+                           """File extension for input data""")
 tf.app.flags.DEFINE_string('output', '../data/output/',
                            """Directory in which to write prediction output""")
 tf.app.flags.DEFINE_bool('write_images', False,
@@ -273,8 +275,7 @@ def predict(sess, image_file, pyramid_levels, input_images,
        tile_shape    : tuple (width,height) of the tile size
     """
 
-    image = cv2.imread(image_file)
-    image = image[:, :, ::-1] # Convert from OpenCV's BGR to RGB
+    image = np.array(Image.open(image_file).convert(mode='RGB'))
     boxes = np.zeros((0,9)) # Initialize array to hold resulting detections
 
     for level in xrange(pyramid_levels):
@@ -345,7 +346,7 @@ def main(argv=None):
     on image(s), writing bounding box information to a text file.
     """
     image_filenames = data_tools.get_filenames(
-         FLAGS.image_path, str.split(FLAGS.filename_pattern,','), 'tiff')
+         FLAGS.image_path, str.split(FLAGS.filename_pattern,','), FLAGS.filename_extension)
 
     if not image_filenames:
         print "No matching images. Exiting..."
