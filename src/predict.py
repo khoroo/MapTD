@@ -275,7 +275,7 @@ def predict(sess, image_file, pyramid_levels, input_images,
        tile_shape    : tuple (width,height) of the tile size
     """
 
-    image = np.array(Image.open(image_file, maximum_pixels=None).convert(mode='RGB'))
+    image = np.array(Image.open(image_file).convert(mode='RGB'))
     boxes = np.zeros((0,9)) # Initialize array to hold resulting detections
 
     for level in xrange(pyramid_levels):
