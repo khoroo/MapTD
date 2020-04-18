@@ -350,7 +350,6 @@ def main(argv=None):
 
     if not image_filenames:
         print "No matching images. Exiting..."
-        print FLAGS.filename_extension
         return
     
     with tf.get_default_graph().as_default():

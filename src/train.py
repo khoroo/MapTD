@@ -51,7 +51,8 @@ tf.app.flags.DEFINE_integer('max_num_steps', 2**21,
                             """Number of optimization steps to run""")
 tf.app.flags.DEFINE_integer('save_checkpoint_secs', 480,
                             """Interval between saving checkpoints""")
-
+tf.app.flags.DEFINE_string('filename_extension','tiff',
+                           """File extension for input data""")
 tf.app.flags.DEFINE_string('image_path','../data/images',
                            """Base directory for image training data""")
 tf.app.flags.DEFINE_string('gt_path','../data/json',
@@ -165,6 +166,7 @@ def input_fn(filename_pattern):
     return lambda: pipeline.get_dataset(FLAGS.image_path, #using default image_ext
                                         FLAGS.gt_path,    #using default gt_ext
                                         str.split(filename_pattern,','),
+                                        image_ext=FLAGS.filename_extension,
                                         tile_size=FLAGS.tile_size,
                                         batch_size=gpu_batch_size)
 

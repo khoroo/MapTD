@@ -18,7 +18,7 @@ import tensorflow as tf
 import numpy as np
 import os
 import cv2
-
+from PIL import Image
 import random
 
 import data_tools
@@ -48,8 +48,7 @@ def _generate_tiles(tile_size,image_files,gt_files):
     # file system for every tile, which is a huge net drag on training
     # throughput when the source images are quite large.
     
-    images = [ cv2.imread(fname)[:,:,::-1] for fname in image_files ] # BGR->RGB
-
+    images = [ np.array(Image.open(fname).convert(mode='RGB')) for fname in image_files ]
     groundtruths = [ data_tools.parse_boxes_from_json(fname)
                      for fname in gt_files ]
     groundtruth_points = [ gt[0] for gt in groundtruths]
@@ -198,7 +197,7 @@ def get_prediction_dataset(image_file, rects_file,**kwargs):
     """
     
     def gen_rect_image(): # Generator for yielding (rect,cropped) tuples
-        image = cv2.imread(image_file)[:,:,::-1] # BGR->RGB
+        image = np.array(Image.open(image_file).convert(mode='RGB'))
         rects = data_tools.parse_boxes_from_text(rects_file,slice_first=True)[0]
 
         for rect in rects:
