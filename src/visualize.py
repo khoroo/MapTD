@@ -84,7 +84,7 @@ def save_image(image, boxes, output_base):
     """
     render_boxes(image, boxes)
     save_as = output_base+'.png'
-    print 'Saving image as', save_as
+    print('Saving image as', save_as)
     plt.savefig(save_as, dpi=1000, bbox_inches='tight')
 
 

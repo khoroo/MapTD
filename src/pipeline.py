@@ -19,6 +19,7 @@ import numpy as np
 import os
 import cv2
 from PIL import Image
+Image.MAX_IMAGE_PIXELS = 2**32
 import random
 
 import data_tools

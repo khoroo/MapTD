@@ -23,7 +23,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-
+Image.MAX_IMAGE_PIXELS = 2**32
 import lanms
 import model
 import data_tools
