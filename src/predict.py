@@ -81,7 +81,7 @@ def save_boxes_to_file(boxes, scores,output_base):
     print('Saving',len(boxes),'boxes to',res_file)
     
     with open(res_file, 'w') as f:
-        for b in range(np.shape(scores)[0]):
+        for b in xrange(np.shape(scores)[0]):
             box = np.squeeze(boxes[b,:,:])
             f.write('{},{},{},{},{},{},{},{},"",{}\r\n'.format(
                 box[0, 0], box[0, 1],
@@ -224,8 +224,8 @@ def convert_geometry_to_boxes(score_map, geo_map, detect_thresh):
     geo_map = np.squeeze(geo_map)
     
     boxes = list()
-    for i in range(len(score_map)):
-        for j in range(len(score_map[0])):
+    for i in xrange(len(score_map)):
+        for j in xrange(len(score_map[0])):
             if (score_map[i, j] < detect_thresh):
                 continue
             point = np.asarray([i, j])
@@ -278,7 +278,7 @@ def predict(sess, image_file, pyramid_levels, input_images,
     image = np.array(Image.open(image_file).convert(mode='RGB'))
     boxes = np.zeros((0,9)) # Initialize array to hold resulting detections
 
-    for level in range(pyramid_levels):
+    for level in xrange(pyramid_levels):
         if level != 0:
             image = cv2.resize( image, (0,0), fx=0.5, fy=0.5,
                                 interpolation=cv2.INTER_CUBIC )
@@ -286,7 +286,7 @@ def predict(sess, image_file, pyramid_levels, input_images,
         image_tiles, shifts = create_tile_set(image, tile_shape)
 
 
-        for i in range(len(image_tiles)):
+        for i in xrange(len(image_tiles)):
             print('predicting tile',i+1,'of',len(image_tiles))
             tile = image_tiles[i]
             shift = shifts[i]
