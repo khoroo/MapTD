@@ -97,7 +97,7 @@ def dist_to_line(p0, p1, points):
     """ Calculate the distance of points to the line segment <p0,p1> """
     norm1 = norm( p1-p0 )
     if norm1 == 0:
-        print p0, p1
+        print(p0, p1)
         norm1 = 1.0
     return np.abs( np.cross(p1-p0, points-p0) / norm1 )
 
@@ -141,7 +141,7 @@ def generate(image_size, rects):
     #---------------------------------------------------------------------------
     # Iterate over rectangles:
 
-    for r in xrange(rects.shape[2]):
+    for r in range(rects.shape[2]):
         rect = rects[:,:,r]
         # Shrink the rectangle, and put in a fillPoly-friendly format
         shrunk_rect = shrink_rect( rect ).astype(np.int32)[np.newaxis,:,:]

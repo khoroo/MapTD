@@ -108,7 +108,7 @@ def compute_ap(scores, matches, num_truths):
     scores     = scores[sorted_ind]
     matches    = matches[sorted_ind]
     
-    for n in xrange(len(scores)):
+    for n in range(len(scores)):
       if matches[n]:
         correct += 1
         avg_precision += float(correct)/(n + 1)
@@ -171,7 +171,7 @@ def evaluate_predictions(ground_truths, predictions,
     if len(dont_cares)==0:
       return matches
     
-    for n in xrange(len(det_polys)):
+    for n in range(len(det_polys)):
       det_poly = det_polys[n]
       for d in dont_cares:
         dont_care_poly = true_polys[d]
@@ -191,8 +191,8 @@ def evaluate_predictions(ground_truths, predictions,
     num_det = len(det_polys)
     
     iou_mat = np.empty( [num_gt, num_det] )
-    for g in xrange(num_gt):
-      for d in xrange(num_det): 
+    for g in range(num_gt):
+      for d in range(num_det): 
         iou_mat[g,d] = polygon_iou(true_polys[g], det_polys[d])
     return iou_mat
 
@@ -213,7 +213,7 @@ def evaluate_predictions(ground_truths, predictions,
 
     det_matched = np.zeros(num_det, dtype=np.bool_) # Matches initially false
 
-    for g in xrange(num_gt):
+    for g in range(num_gt):
       for d in range(num_det):
         # Skip the pairing if we've already matched the detection or
         # either polygon is a don't care
@@ -281,7 +281,7 @@ def evaluate_predictions(ground_truths, predictions,
     num_det_care = num_det - len(det_dont_cares)
     num_correct = float(len(matched))
     
-    for d in xrange(num_det):
+    for d in range(num_det):
       if d not in det_dont_cares: # exclude don't care detections
         scores.append(prediction['scores'][d])
         matches.append(d in matched)

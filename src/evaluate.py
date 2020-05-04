@@ -97,8 +97,8 @@ def main(argv=None):
       iou_match_thresh=FLAGS.iou_thresh)
 
     # Display save the results
-    print sample_stats
-    print total_stats
+    print(sample_stats)
+    print(total_stats)
     
     if FLAGS.save_result:
       import json

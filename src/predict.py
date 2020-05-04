@@ -78,7 +78,7 @@ def save_boxes_to_file(boxes, scores,output_base):
     """
     res_file = output_base+'.txt'
 
-    print 'Saving',len(boxes),'boxes to',res_file
+    print('Saving',len(boxes),'boxes to',res_file)
     
     with open(res_file, 'w') as f:
         for b in range(np.shape(scores)[0]):
@@ -189,8 +189,8 @@ def create_tile_set(image, tile_shape):
     y_tiles = tile_ticks( im_height, tile_height )
     x_tiles = tile_ticks( im_width, tile_width )
 
-    print y_tiles
-    print x_tiles
+    print(y_tiles)
+    print(x_tiles)
     
     # Loop over all tile (position, size) pairs
     for y,h in zip(y_tiles[0],y_tiles[1]):
@@ -224,8 +224,8 @@ def convert_geometry_to_boxes(score_map, geo_map, detect_thresh):
     geo_map = np.squeeze(geo_map)
     
     boxes = list()
-    for i in xrange(len(score_map)):
-        for j in xrange(len(score_map[0])):
+    for i in range(len(score_map)):
+        for j in range(len(score_map[0])):
             if (score_map[i, j] < detect_thresh):
                 continue
             point = np.asarray([i, j])
@@ -278,7 +278,7 @@ def predict(sess, image_file, pyramid_levels, input_images,
     image = np.array(Image.open(image_file).convert(mode='RGB'))
     boxes = np.zeros((0,9)) # Initialize array to hold resulting detections
 
-    for level in xrange(pyramid_levels):
+    for level in range(pyramid_levels):
         if level != 0:
             image = cv2.resize( image, (0,0), fx=0.5, fy=0.5,
                                 interpolation=cv2.INTER_CUBIC )
@@ -286,8 +286,8 @@ def predict(sess, image_file, pyramid_levels, input_images,
         image_tiles, shifts = create_tile_set(image, tile_shape)
 
 
-        for i in xrange(len(image_tiles)):
-            print 'predicting tile',i+1,'of',len(image_tiles)
+        for i in range(len(image_tiles)):
+            print('predicting tile',i+1,'of',len(image_tiles))
             tile = image_tiles[i]
             shift = shifts[i]
             score, geometry = sess.run([f_score, f_geometry],
@@ -308,7 +308,7 @@ def predict(sess, image_file, pyramid_levels, input_images,
                 # Resize tile boxes to global image coords from pyramid-level
                 tile_boxes[:,:-1] *= (2**level)
                 boxes = np.concatenate((boxes, tile_boxes), axis=0)
-    print 'LANMS...'
+    print('LANMS...')
     boxes = sort_by_row(boxes) # still ij
     boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), FLAGS.nms_thresh)
 
@@ -319,7 +319,7 @@ def predict(sess, image_file, pyramid_levels, input_images,
     output_base = os.path.join(FLAGS.output,
                             os.path.splitext(
                                 os.path.basename( image_file ))[0] )
-    print 'writing output'
+    print('writing output')
     if boxes is not None:
         save_boxes_to_file(boxes, scores, output_base)
         
@@ -349,7 +349,7 @@ def main(argv=None):
          FLAGS.image_path, str.split(FLAGS.filename_pattern,','), FLAGS.filename_extension)
 
     if not image_filenames:
-        print "No matching images. Exiting..."
+        print("No matching images. Exiting...")
         return
     
     with tf.get_default_graph().as_default():
