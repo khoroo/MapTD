@@ -311,20 +311,22 @@ def predict(sess, image_file, pyramid_levels, input_images,
     print('LANMS...')
     boxes = sort_by_row(boxes) # still ij
     boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), FLAGS.nms_thresh)
+    try:
+        scores = boxes[:,-1]
+        boxes = boxes[:, :8].reshape(-1, 4, 2)
+        boxes = np.flip(boxes, axis=2) #IMPORTANT ij-xy conversion
 
-    scores = boxes[:,-1]
-    boxes = boxes[:, :8].reshape(-1, 4, 2)
-    boxes = np.flip(boxes, axis=2) #IMPORTANT ij-xy conversion
-
-    output_base = os.path.join(FLAGS.output,
-                            os.path.splitext(
-                                os.path.basename( image_file ))[0] )
-    print('writing output')
-    if boxes is not None:
-        save_boxes_to_file(boxes, scores, output_base)
-        
-    if FLAGS.write_images:
-        visualize.save_image( image, boxes, output_base)
+        output_base = os.path.join(FLAGS.output,
+                                os.path.splitext(
+                                    os.path.basename( image_file ))[0] )
+        print('writing output')
+        if boxes is not None:
+            save_boxes_to_file(boxes, scores, output_base)
+            
+        if FLAGS.write_images:
+            visualize.save_image( image, boxes, output_base)
+    except:
+        print('error of some kind')
     
 
 def restore_model(sess):
