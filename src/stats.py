@@ -19,7 +19,6 @@
 
 #  stats.py -- Utilities for evaluating prediction statitics on ground truth
 
-import tensorflow as tf
 import numpy as np
 from shapely.geometry.polygon import Polygon
 

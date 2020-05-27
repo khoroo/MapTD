@@ -22,6 +22,8 @@ import numpy as np
 import os
 import sys
 import matplotlib.pyplot as plt
+from PIL import Image
+
 
 
 baseline_color='blue'
@@ -118,7 +120,7 @@ def render_boxes(image, boxes):
 
 
 
-def main(image_path, ground_truth_file):
+def main(image_path, ground_truth_file, save_path):
     """Load and display boxes on an image
 
     Parameters
@@ -126,9 +128,13 @@ def main(image_path, ground_truth_file):
       truth     : name of the text file that contains the boxes to draw
     """
     boxes = load_boxes(ground_truth_file)
-    image = plt.imread(image_path)
-    render_boxes(image, boxes)
-    plt.show()
+    image = np.array(Image.open(image_path).convert(mode='RGB'))
+    if save_path == 'no':
+        render_boxes(image, boxes)
+        plt.show()
+    else:
+        save_image(image, boxes, save_path)
+    
 
 if __name__ == "__main__":
-  main(sys.argv[1], sys.argv[2])
+  main(sys.argv[1], sys.argv[2], sys.argv[3])

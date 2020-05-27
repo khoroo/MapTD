@@ -14,57 +14,63 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import tensorflow as tf
 import os
 import data_tools
 import stats
+import argparse
 
 
-tf.app.flags.DEFINE_string('gt_path','../data/test',
-                           """Base directory for ground truth data""")
-tf.app.flags.DEFINE_string('pred_path','../data/predict',
-                           """Base directory for predicted output data""")
-tf.app.flags.DEFINE_string('filename_pattern','*',
-                           """File pattern for data""")
-tf.app.flags.DEFINE_float('iou_thresh',0.5,
-                          """Intersection-over-Union threshold for match""")
-tf.app.flags.DEFINE_float('score_thresh',None,
-                          """Score threshold for predictions""")
-tf.app.flags.DEFINE_boolean('match_labels',False,
-                            """Whether to require labels to match""")
-tf.app.flags.DEFINE_string('save_result',None,
-                          """JSON file in which to save results in pred_path""")
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--gt_path", type=str, default='../data/test',
+                    help='Base directory for ground truth data')
+parser.add_argument("--pred_path", type=str, default='../data/predict',
+                    help='Base directory for predicted output data')
+parser.add_argument("--score_thresh", type=float, default=None,
+                    help='Score threshold to filter by')
+parser.add_argument("--filename_pattern", type=str, default='*',
+                    help='File pattern for data')
+parser.add_argument("--iou_thresh", type=float, default=0.5,
+                    help='Intersection-over-Union threshold for match')
+parser.add_argument("--match_labels", action="store_true", default=False,
+                    help='Whether to require labels to match')
+parser.add_argument("--json", action="store_true", default=False,
+                    help='Ground truth json or txt, default txt')
+parser.add_argument("--save_result", type=str, default=None,
+                    help='JSON file in which to save results in pred_path')
 
-FLAGS = tf.app.flags.FLAGS
-
-def threshold_predictions(polys,labels,scores):
+def threshold_predictions(polys,labels,scores, args):
 
   t_polys = list()
   t_labels = list()
   t_scores = list()
 
   for (poly,label,score) in zip(polys,labels,scores):
-    if score > FLAGS.score_thresh:
+    if score > args.score_thresh:
       t_polys.append(poly)
       t_labels.append(label)
       t_scores.append(score)
   return t_polys,t_labels,t_scores
 
 
-def main(argv=None):
+def main(args):
     """Loads up ground truth and prediction files, calculates and
        prints statistics
     """
 
     # Load file lists
     prediction_files = data_tools.get_filenames(
-      FLAGS.pred_path,
-      str.split(FLAGS.filename_pattern,','),
+      args.pred_path,
+      str.split(args.filename_pattern,','),
       'txt')
     
+    if args.json:
+        ext_paired = 'json'
+    else:
+        ext_paired = 'txt'
+    
     ground_truth_files = data_tools.get_paired_filenames(
-      prediction_files, FLAGS.gt_path, 'json' )
+      prediction_files, args.gt_path, ext_paired)
 
     assert len(ground_truth_files) == len(prediction_files)
 
@@ -75,13 +81,16 @@ def main(argv=None):
     for pred_file,truth_file in zip(prediction_files,ground_truth_files):
 
       base = os.path.splitext(os.path.basename(pred_file))[0]
-
-      [_,gt_polys,gt_labels] = data_tools.parse_boxes_from_json( truth_file )
+      
+      if args.json:
+        [_,gt_polys,gt_labels,_] = data_tools.parse_boxes_from_text( truth_file )
+      else:
+        [_,gt_polys,gt_labels] = data_tools.parse_boxes_from_json( truth_file )
       [_,polys,labels,scores] = data_tools.parse_boxes_from_text( pred_file )
 
-      if FLAGS.score_thresh: # Filter predictions if necessary
+      if args.score_thresh: # Filter predictions if necessary
         polys,labels,scores = threshold_predictions(
-          polys, labels, scores)
+          polys, labels, scores, args)
 
       predictions[base] =  { 'polygons' : polys,
                              'labels'   : labels,
@@ -93,21 +102,22 @@ def main(argv=None):
     sample_stats,total_stats = stats.evaluate_predictions(
       ground_truths,
       predictions,
-      match_labels=FLAGS.match_labels,
-      iou_match_thresh=FLAGS.iou_thresh)
+      match_labels=args.match_labels,
+      iou_match_thresh=args.iou_thresh)
 
     # Display save the results
     print(sample_stats)
     print(total_stats)
     
-    if FLAGS.save_result:
+    if args.save_result:
       import json
-      with open(os.path.join(FLAGS.pred_path,FLAGS.save_result+'.json'),'w') \
+      with open(os.path.join(args.pred_path,args.save_result+'.json'),'w') \
            as fd:
         json.dump({'individual': sample_stats, 'overall': total_stats}, fd,
                   indent=4)
 
     
 if __name__ == "__main__":
-    tf.app.run()
+    args = parser.parse_args()
+    main(args)
      
